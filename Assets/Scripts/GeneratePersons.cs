@@ -24,6 +24,7 @@ public class GeneratePersons : MonoBehaviour
     {
         //BeginGame();
         this.SpawnEnemyPerson(TypeAttack.Melee);
+        this.SpawnFriendlyPerson(TypeAttack.Melee);
     }
 
     private void BeginGame()
@@ -31,9 +32,11 @@ public class GeneratePersons : MonoBehaviour
         this.CreatePerson(this.steveMeleePrefabs[0]);
     }
 
-    private void SpawnFriendlyPerson()
-    { 
+    private void SpawnFriendlyPerson(TypeAttack typeAttack)
+    {
+        
     }
+
 
     private void SpawnEnemyPerson(TypeAttack typeAttack)
     {
@@ -44,7 +47,7 @@ public class GeneratePersons : MonoBehaviour
 
                 var personPrefab = CreatePerson(this.steveMeleePrefabs[0]);
 
-                arrayPersons.SetSteveEnemy(personPrefab);
+               // arrayPersons.SetSteveEnemy(personPrefab);
 
                 for(var t = battleFieldLinesEnemy.Count - 1; t >= 0; t--)
                 {

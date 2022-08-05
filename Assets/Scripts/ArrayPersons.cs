@@ -4,29 +4,23 @@ using UnityEngine;
 public class ArrayPersons : MonoBehaviour
 {
 
-    private List<GameObject> steveEnemies = new List<GameObject>();
-
-    private List<GameObject> steveFriendlies = new List<GameObject>();
+   [SerializeField] private List<GameObject> steves = new List<GameObject>();
 
 
-    public GameObject GetSteveEnemy(int index)
+    public int GetCount()
     {
-        return steveEnemies[index];
+        return steves.Count;
     }
 
-    public GameObject GetSteveFriendly(int index)
+    public GameObject GetSteve(int index)
     {
-        return steveFriendlies[index];
+        return steves[index];
     }
 
-    public void SetSteveEnemy(GameObject value)
+    public void SetSteve(GameObject value)
     {
-        steveEnemies.Add(value);
+        steves.Add(value);
     }
 
-    public void SetSteveFriendly(GameObject value)
-    {
-        steveFriendlies.Add(value);
-    }
 
 }
