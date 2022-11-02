@@ -1,15 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 abstract public class BasePerson : MonoBehaviour
 {
-
-    [SerializeField] protected PersonData currentLevelPerson;
-
-    [SerializeField] protected ArrayPersons allPersonsOnBattle;
-
-    [SerializeField] protected GameState gameState;
+    [SerializeField] private PersonData _currentLevelPerson;
+    public PersonData CurrentLevelPerson => _currentLevelPerson;
 
     protected Animator animator;
 
@@ -21,39 +16,24 @@ abstract public class BasePerson : MonoBehaviour
 
     protected int _takeDamage = 0;
 
-    protected Coroutine takeDamageCoroutines;
-
     protected BasePerson currentEnemyTarget;
 
-    abstract public void Move();
+    public event Action<BasePerson> OnDie;
 
-    virtual public int GetDamage()
-    {
-        return currentLevelPerson.Damage;
-    }
+    abstract public void Move();
 
     virtual public void TakeDamage(int damage)
     {
         currentHealth -= damage;
         if (currentHealth <= 0)
         {
-            DestroySteve();
+            currentHealth = 0;
         }
     }
 
-    virtual protected void DestroySteve()
+    public virtual void Die()
     {
+        OnDie?.Invoke(this);
         Destroy(gameObject);
     }
-
-    protected IEnumerator TakeDamageEverySecond()
-    {
-        while (true)
-        {
-            this.TakeDamage(_takeDamage);
-            Debug.Log(transform.name + " : " + currentHealth);
-            yield return new WaitForSeconds(1);
-        }
-    }
-
 }

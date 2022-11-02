@@ -2,25 +2,31 @@ using UnityEngine;
 
 public class PersonMelee : BasePerson
 {
-
     private bool _IsFight = false;
 
     private void Start()
     {
         animator = transform.GetChild(0).GetComponent<Animator>();
+
         phisicSteve = transform.GetComponent<Rigidbody>();
-        currentHealth = currentLevelPerson.Health;
+
+        currentHealth = CurrentLevelPerson.Health;
+    }
+
+    private void Update()
+    {
+        if (currentHealth == 0)
+        {
+            this.Die();
+        }
     }
 
     private void FixedUpdate()
-    {
-        if (gameState.GameStateType == GameStateTypes.Battle)
+    {       
+        if (!_IsFight)
         {
-            if (!_IsFight)
-            {
-                FindEnemy();
-                Move();
-            }
+            //FindEnemy(); 
+            //Move();
         }
     }
 
@@ -30,31 +36,17 @@ public class PersonMelee : BasePerson
         {
             if (enemy.tag != this.transform.tag)
             {
-                if(currentEnemyTarget == null)
+                if (currentEnemyTarget == null)
                     currentEnemyTarget = enemy;
-                
+
                 _IsFight = true;
-                _takeDamage = _takeDamage + enemy.GetDamage();
+                _takeDamage = _takeDamage + enemy.CurrentLevelPerson.Damage;
                 animator.SetBool("IsRunning", false);
                 animator.SetBool("IsAttack", true);
             }
             Debug.Log(transform.name + " : " + currentHealth);
         }
     }
-
-    /*private void OnCollisionExit(Collision collision)
-    { 
-        if (collision.transform.TryGetComponent<BasePerson>(out var enemy))
-        {
-            if (enemy.tag != this.transform.tag)
-            {
-                takeDamageCoroutines.RemoveAt(0);
-                animator.SetBool("IsRunning", true);
-                animator.SetBool("IsAttack", false);
-                _IsFight = false;
-            }
-        }
-    }*/
 
     override public void Move()
     {
@@ -66,7 +58,7 @@ public class PersonMelee : BasePerson
     public void FindEnemy()
     {
         BasePerson nearEnemy = null;
-        for (int i = 0; i < allPersonsOnBattle.GetCount(); i++)
+/*        for (int i = 0; i < allPersonsOnBattle.GetCount(); i++)
         {
             if (allPersonsOnBattle.GetSteve(i).tag != transform.tag)
             {
@@ -85,15 +77,8 @@ public class PersonMelee : BasePerson
                     nearEnemy = allPersonsOnBattle.GetSteve(i).GetComponent<BasePerson>();
                 }
             }
-        }
+        }*/
 
         this.currentEnemyTarget = nearEnemy;
-
     }
-
-    public void StartTakeDamade()
-    {
-        takeDamageCoroutines = StartCoroutine(TakeDamageEverySecond());
-    }
-
 }

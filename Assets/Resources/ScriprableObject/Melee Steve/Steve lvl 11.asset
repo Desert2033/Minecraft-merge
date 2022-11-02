@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 29565
   damage: 5128
+  level: 11
+  formAttack: Melee

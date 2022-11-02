@@ -14,5 +14,14 @@ public class PersonData : ScriptableObject
 
     public int Damage => damage;
 
+    [SerializeField]
+    private int level;
+
+    public int Level => level;
+
+    [SerializeField]
+    private string formAttack;
+
+    public string FormAttack => formAttack;
 
 }
