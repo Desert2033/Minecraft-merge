@@ -4,22 +4,28 @@ using UnityEngine;
 
 public class PersonRange : BasePerson
 {
-    // Start is called before the first frame update
     void Start()
     {
-        animator = transform.GetChild(0).GetComponent<Animator>();
+       /* animator = transform.GetChild(0).GetComponent<Animator>();
 
         phisicSteve = transform.GetComponent<Rigidbody>();
 
-        currentHealth = CurrentLevelPerson.Health;
+        currentHealth = CurrentLevelPerson.Health;*/
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
-    override public void Move() { }
+    public override void Move() { }
 
+    public override void TakeDamage(int damage)
+    {
+    }
+
+    public override void ChangeTarget()
+    {
+        throw new System.NotImplementedException();
+    }
 }

@@ -23,6 +23,8 @@ public class GameState : MonoBehaviour
 
         _fightSystem.gameObject.SetActive(true);
 
+        _fightSystem.StartFight();
+
         _panelPreview.SetActive(false);
     }
 

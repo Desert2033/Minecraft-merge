@@ -2,83 +2,130 @@ using UnityEngine;
 
 public class PersonMelee : BasePerson
 {
-    private bool _IsFight = false;
+    private bool _isFight = false;
+
+    private float _cooldown = 0.5f;
+
+    private Animator _animator;
+
+    private Rigidbody _phisicSteve;
+
+    private float _speed = 2f;
+
+    private int _currentHealth;
 
     private void Start()
     {
-        animator = transform.GetChild(0).GetComponent<Animator>();
+        _animator = transform.GetChild(0).GetComponent<Animator>();
 
-        phisicSteve = transform.GetComponent<Rigidbody>();
+        _phisicSteve = transform.GetComponent<Rigidbody>();
 
-        currentHealth = CurrentLevelPerson.Health;
-    }
-
-    private void Update()
-    {
-        if (currentHealth == 0)
-        {
-            this.Die();
-        }
+        _currentHealth = CurrentLevelPerson.Health;
     }
 
     private void FixedUpdate()
-    {       
-        if (!_IsFight)
+    {
+        if (_currentHealth <= 0)
         {
-            //FindEnemy(); 
-            //Move();
+            base.Die();
+        }
+
+        if (!_isFight)
+        {
+            Move();
+        }
+        else
+        {
+            LookTarget();
+            if (_cooldown <= 0f)
+            {
+                CurrentEnemyTarget.TakeDamage(CurrentLevelPerson.Damage);
+                _cooldown = 1f;
+            }
+            else
+            {
+                _cooldown -= Time.deltaTime;
+            }
         }
     }
 
     private void OnCollisionEnter(Collision collision)
-    {
+    { 
         if (collision.transform.TryGetComponent<BasePerson>(out var enemy))
         {
-            if (enemy.tag != this.transform.tag)
+            if (enemy == CurrentEnemyTarget)
             {
-                if (currentEnemyTarget == null)
-                    currentEnemyTarget = enemy;
+                _isFight = true;
 
-                _IsFight = true;
-                _takeDamage = _takeDamage + enemy.CurrentLevelPerson.Damage;
-                animator.SetBool("IsRunning", false);
-                animator.SetBool("IsAttack", true);
+                _animator.SetBool("IsRunning", false);
+
+                _animator.SetBool("IsAttack", true);
             }
-            Debug.Log(transform.name + " : " + currentHealth);
         }
     }
 
-    override public void Move()
+    private void OnCollisionExit(Collision collision)
     {
-        animator.SetBool("IsRunning", true);
-        transform.LookAt(currentEnemyTarget.transform);
-        phisicSteve.MovePosition(transform.position + transform.forward * Time.deltaTime * speed);
+        if (collision.transform.TryGetComponent<BasePerson>(out var enemy))
+        {
+            if (enemy == CurrentEnemyTarget)
+            {
+                _isFight = false;
+
+                _animator.SetBool("IsRunning", true);
+
+                _animator.SetBool("IsAttack", false);
+            }
+        }
     }
 
-    public void FindEnemy()
+    private void LookTarget()
     {
-        BasePerson nearEnemy = null;
-/*        for (int i = 0; i < allPersonsOnBattle.GetCount(); i++)
+        Vector3 relativePos = CurrentEnemyTarget.transform.position - transform.position;
+
+        Quaternion rotation = Quaternion.LookRotation(relativePos);
+
+        rotation.x = 0;
+        rotation.z = 0;
+
+        transform.rotation = rotation;
+    }
+
+    public override void ChangeTarget()
+    { 
+        _isFight = false;
+
+        _animator.SetBool("IsRunning", true);
+
+        _animator.SetBool("IsAttack", false);
+
+        _cooldown = 0.5f;
+    }
+
+    public override void Move()
+    {
+        if (_isMove)
         {
-            if (allPersonsOnBattle.GetSteve(i).tag != transform.tag)
+            if (CurrentEnemyTarget != null)
             {
-                if(nearEnemy != null)
-                {
-                    float distanceEnemy = Vector3.Distance(allPersonsOnBattle.GetSteve(i).transform.position, this.transform.position);
-                    float distanceNearEnemy = Vector3.Distance(nearEnemy.transform.position, this.transform.position);
+                _animator.SetBool("IsRunning", true);
 
-                    if (distanceNearEnemy > distanceEnemy)
-                    {
-                        nearEnemy = allPersonsOnBattle.GetSteve(i).GetComponent<BasePerson>();
-                    }
-                }
-                else
-                {
-                    nearEnemy = allPersonsOnBattle.GetSteve(i).GetComponent<BasePerson>();
-                }
+                this.LookTarget();
+
+                _phisicSteve.MovePosition(transform.position + transform.forward * Time.deltaTime * _speed);
             }
-        }*/
+            else
+            {
+                _animator.SetBool("IsRunning", false);
+                _animator.SetBool("IsAttack", false);
+            }
+        }
+    }
 
-        this.currentEnemyTarget = nearEnemy;
+    public override void TakeDamage(int damage)
+    {
+        _currentHealth -= damage;
+
+        //Debug.Log($"{CurrentLevelPerson.name} current HP : {_currentHealth}");
     }
 }

@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ArrayPersons : MonoBehaviour
 {
     [SerializeField] private List<BasePerson> _friendlies = new List<BasePerson>();
 
     [SerializeField] private List<BasePerson> _enemies = new List<BasePerson>();
+
+    public event Action<BasePerson> OnPersonDie;
 
     private void AddPerson(List<BasePerson> listAdd, BasePerson person)
     {
@@ -35,6 +38,40 @@ public class ArrayPersons : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (_friendlies.Count != 0)
+        {
+            foreach (var item in _friendlies)
+            {
+                item.OnDie += RemovePerson;
+            }
+        }
+
+        if (_enemies.Count != 0)
+        {
+            foreach (var item in _enemies)
+            {
+                item.OnDie += RemovePerson;
+            }
+        }
+    }
+
+    private void OnDisable()
+    {
+        MinusActions();
+    }
+
+    public bool IsFriendlyPerson(BasePerson person)
+    {
+        if (_friendlies.Contains(person))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public void RemovePerson(BasePerson person)
     {
         if (_friendlies.Contains(person))
@@ -46,6 +83,8 @@ public class ArrayPersons : MonoBehaviour
         {
             _enemies.Remove(person);
         }
+
+        OnPersonDie?.Invoke(person);
     }
 
     public void SetFriendlyPerson(BasePerson person)
@@ -65,7 +104,7 @@ public class ArrayPersons : MonoBehaviour
             return _friendlies.ToArray();
         }
 
-        throw new System.Exception("List 'Friendlies Person' is empty");
+        return null;
     }
 
     public BasePerson[] GetEnemies()
@@ -75,11 +114,6 @@ public class ArrayPersons : MonoBehaviour
             return _enemies.ToArray();
         }
 
-        throw new System.Exception("List 'Enemies Person' is empty");
-    }
-
-    private void OnDisable()
-    {
-        MinusActions();
+        return null;
     }
 }

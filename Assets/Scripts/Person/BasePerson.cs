@@ -6,29 +6,21 @@ abstract public class BasePerson : MonoBehaviour
     [SerializeField] private PersonData _currentLevelPerson;
     public PersonData CurrentLevelPerson => _currentLevelPerson;
 
-    protected Animator animator;
+    protected bool _isMove = false;
 
-    protected Rigidbody phisicSteve;
-
-    protected float speed = 3;
-
-    protected int currentHealth;
-
-    protected int _takeDamage = 0;
-
-    protected BasePerson currentEnemyTarget;
+    public BasePerson CurrentEnemyTarget { set; get; }
 
     public event Action<BasePerson> OnDie;
 
     abstract public void Move();
 
-    virtual public void TakeDamage(int damage)
+    abstract public void TakeDamage(int damage);
+
+    abstract public void ChangeTarget();
+
+    public void StartMove()
     {
-        currentHealth -= damage;
-        if (currentHealth <= 0)
-        {
-            currentHealth = 0;
-        }
+        _isMove = true;
     }
 
     public virtual void Die()

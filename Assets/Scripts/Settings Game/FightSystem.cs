@@ -4,41 +4,111 @@ public class FightSystem : MonoBehaviour
 {
     [SerializeField] private ArrayPersons _arrayPersons;
 
-    void Start()
+    private void OnDisable()
     {
-        
+        _arrayPersons.OnPersonDie -= OnDieTarget;
     }
 
-    void Update()
+    public void StartFight()
     {
-        
-    }
+        this.FindTargetForAllPersons();
 
- /*   public void FindEnemy()
-    {
-        BasePerson nearEnemy = null;
-        for (int i = 0; i < allPersonsOnBattle.GetCount(); i++)
+        _arrayPersons.OnPersonDie += OnDieTarget;
+
+        foreach (var enemy in _arrayPersons.GetEnemies())
         {
-            if (allPersonsOnBattle.GetSteve(i).tag != transform.tag)
+            enemy.StartMove();
+        }
+
+        foreach (var friendly in _arrayPersons.GetFriendlies())
+        {
+            friendly.StartMove();
+        }
+    }
+
+    public void FindTargetForAllPersons() 
+    {
+        foreach (var enemy in _arrayPersons.GetEnemies())
+        {
+            if (enemy.CurrentEnemyTarget == null)
             {
-                if (nearEnemy != null)
+                this.FindTarget(enemy);
+            }
+        }
+
+        foreach(var friendly in _arrayPersons.GetFriendlies())
+        {
+            if (friendly.CurrentEnemyTarget == null)
+            {
+                this.FindTarget(friendly);
+            }
+        }
+    }
+
+    public void FindTarget(BasePerson personWithoutTarget)
+    {
+        BasePerson[] searchTarget;
+
+        if (_arrayPersons.IsFriendlyPerson(personWithoutTarget))
+        {
+            searchTarget = _arrayPersons.GetEnemies();
+        }
+        else
+        {
+            searchTarget = _arrayPersons.GetFriendlies();
+        }
+
+        BasePerson nearTarget = null;
+
+        if (searchTarget != null) 
+        {
+            foreach (var target in searchTarget)
+            {
+                if (nearTarget != null)
                 {
-                    float distanceEnemy = Vector3.Distance(allPersonsOnBattle.GetSteve(i).transform.position, this.transform.position);
-                    float distanceNearEnemy = Vector3.Distance(nearEnemy.transform.position, this.transform.position);
+                    float distanceEnemy = Vector3.Distance(target.transform.position, personWithoutTarget.transform.position);
+                        
+                    float distanceNearEnemy = Vector3.Distance(nearTarget.transform.position, personWithoutTarget.transform.position);
 
                     if (distanceNearEnemy > distanceEnemy)
                     {
-                        nearEnemy = allPersonsOnBattle.GetSteve(i).GetComponent<BasePerson>();
+                        nearTarget = target;
                     }
                 }
                 else
                 {
-                    nearEnemy = allPersonsOnBattle.GetSteve(i).GetComponent<BasePerson>();
+                    nearTarget = target;
                 }
             }
         }
 
-        this.currentEnemyTarget = nearEnemy;
+        personWithoutTarget.CurrentEnemyTarget = nearTarget;
     }
-*/
+
+    public void OnDieTarget(BasePerson targetDie)
+    {
+        if (_arrayPersons.GetEnemies() != null)
+        {
+            foreach (var enemy in _arrayPersons.GetEnemies())
+            {
+                if (enemy.CurrentEnemyTarget == targetDie)
+                {
+                    FindTarget(enemy);
+                    enemy.ChangeTarget();
+                }
+            }
+        }
+
+        if (_arrayPersons.GetFriendlies() != null)
+        {
+            foreach (var frienly in _arrayPersons.GetFriendlies())
+            {
+                if (frienly.CurrentEnemyTarget == targetDie)
+                {
+                    FindTarget(frienly);
+                    frienly.ChangeTarget();
+                }
+            }
+        }
+    }
 }
