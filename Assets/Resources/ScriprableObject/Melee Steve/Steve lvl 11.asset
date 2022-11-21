@@ -15,4 +15,6 @@ MonoBehaviour:
   health: 29565
   damage: 5128
   level: 11
+  _coinsGive: 11
+  _mergePrice: 11
   formAttack: Melee
